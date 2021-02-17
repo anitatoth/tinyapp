@@ -110,25 +110,41 @@ app.post("/login", (req, res) => {
   res.redirect('/urls');
  });
  
-
+ function checkEmailExists(email){
+  for (let key in users) {  
+    if ((email === users[key].email)) {
+      return true;
+    }
+  }
+  return false;
+ }
  app.post('/register', (req, res) => {
-  // get data from request body
+  //1. get data from request body
   const email = req.body.email;
   const password = req.body.password;
   const id = generateRandomString(6)
 
-  // create a user object
-  const user = {
-    id,
-    email,
-    password
+  //2. To check for the email and password should not be empty
+  if(email==="" || password===""){
+    return res.status(400).send('Please enter an email and password.');
   }
-
-  // add user object to user database
-  users[id] = user;
-
-  res.cookie('user_id', id)
-  res.redirect('/urls');
+  //3. To check whether the email exists or not
+  if(checkEmailExists(email)){
+    return res.status(400).send("Email has already been taken. Please try with another one!")
+    
+  } else{
+    // create a user object
+    const user = {
+      id,
+      email,
+      password
+    };
+    // add user object to user database
+    users[id] = user;
+    res.cookie('user_id', id)
+    res.redirect('/urls');
+  }
+  
 });
 
 

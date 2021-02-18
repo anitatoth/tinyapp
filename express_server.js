@@ -32,8 +32,8 @@ const users = {
   },
  "user2RandomID": {
     id: "user2RandomID", 
-    email: "user2@example.com", 
-    password: "dishwasher-funk"
+    email: "b@b.ca", 
+    password: "abcd"
   }
 }
 
@@ -56,7 +56,17 @@ app.get("/hello", (req, res) => {
 
 
 app.get('/register', (req, res) => {
-  res.render('register');
+  const templateVars = {
+    user: null, 
+  }
+  res.render('register', templateVars);
+});
+
+app.get('/login', (req, res) => {
+  const templateVars = {
+    user: null, 
+  }
+  res.render('login', templateVars);
 });
 
 
@@ -94,35 +104,52 @@ app.get("/u/:shortURL", (req, res) => {
 
 ////////////////////////////////////////////////////////
 
-
-app.post("/login", (req, res) => {
-  const emailSubmitted = req.body.email;
-  // console.log('emailsubmitted', emailSubmitted);
-  // console.log('user', users);
-  for (let key in users) {
-    // console.log('looping through object', key);
-    // console.log('users key at email', users[key].email)
-    if (!(emailSubmitted === users[key].email)) {
-      res.redirect('/login');
-    }
-  }
-  res.cookie("user_id", emailSubmitted);
-  res.redirect('/urls');
- });
- 
- function checkEmailExists(email){
+function checkEmailExists(email){
   for (let key in users) {  
     if ((email === users[key].email)) {
-      return true;
+      return key;
     }
   }
-  return false;
+  return null;
  }
+
+app.post("/login", (req, res) => {
+  //1 get data from request body
+  const emailSubmitted = req.body.email;
+  const passwordSubmitted = req.body.password;
+  const key = checkEmailExists(emailSubmitted);
+  //2 to check for email and if not found send 403 status code
+  
+    if (!key) {
+      return res.status(403).send("This email cannot be found.")
+    } 
+
+  //3 if email located then compare password given to existing, and if it doesn't match send 403 status code.
+    if ((users[key].password !== passwordSubmitted)){
+
+      console.log('passwordsubmited', passwordSubmitted)
+      console.log('users at key at password', users[key].password)
+      console.log('users at key', users[key].id)
+
+      return res.status(403).send("The password does not match the email entered.")
+    }
+
+  
+  
+  res.cookie("user_id", key);
+
+  
+  res.redirect('/urls');
+
+ });
+ 
+
  app.post('/register', (req, res) => {
   //1. get data from request body
   const email = req.body.email;
   const password = req.body.password;
   const id = generateRandomString(6)
+  
 
   //2. To check for the email and password should not be empty
   if(email==="" || password===""){
@@ -131,7 +158,7 @@ app.post("/login", (req, res) => {
   //3. To check whether the email exists or not
   if(checkEmailExists(email)){
     return res.status(400).send("Email has already been taken. Please try with another one!")
-    
+
   } else{
     // create a user object
     const user = {
@@ -140,6 +167,7 @@ app.post("/login", (req, res) => {
       password
     };
     // add user object to user database
+  
     users[id] = user;
     res.cookie('user_id', id)
     res.redirect('/urls');

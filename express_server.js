@@ -125,8 +125,8 @@ function urlsForUser(id) {
 // console.log('testing 1234', urlDatabase[url].userID)
 // console.log('testing cookies', users[req.cookies['user_id']])
 
-app.get("/loginregister", (req, res) => {
-  res.render('loginregister')
+app.get("/login", (req, res) => {
+  res.render('login')
 });
 
 
@@ -135,7 +135,7 @@ app.get("/urls", (req, res) => {
   const user = users[req.session.user_id]
  console.log('user', user)
   if(!user) {
-    res.redirect('/loginregister');
+    res.redirect('/login');
   }
  
   const urls = urlsForUser(user.id);
@@ -153,7 +153,7 @@ app.get("/urls/:shortURL", (req, res) => {
 
   
   if (!req.session.user_id) {
-    res.redirect('/loginregister');
+    res.redirect('/login');
   }
 
   const user = users[req.session.user_id]
@@ -165,7 +165,7 @@ app.get("/urls/:shortURL", (req, res) => {
       user: users[req.session.user_id] };
       res.render("urls_show", templateVars);
   } else {
-    res.redirect('/loginregister');
+    res.redirect('/login');
   }
 
 });
@@ -194,18 +194,11 @@ app.post("/login", (req, res) => {
     } 
 
   //3 if email located then compare password given to existing, and if it doesn't match send 403 status code.
-    // if ((users[key].password !== passwordSubmitted)){
 
-    //   // console.log('passwordsubmited', passwordSubmitted)
-    //   // console.log('users at key at password', users[key].password)
-    //   // console.log('users at key', users[key].id)
-
-    //   return res.status(403).send("The password does not match the email entered.")
-    // }
 
     bcrypt.compare(passwordSubmitted, users[key].password, (err, result) => {
       if (!result) {
-        return res.status(401).send('Password incorrect');
+        return res.status(403).send('Password incorrect');
       }
 
   //res.cookie("user_id", key);
@@ -301,7 +294,7 @@ app.post('/urls/:shortURL', (req, res) => {
   //console.log('line 273',req.cookies['user_id'])
   const id = req.session['user_id'];
   if(!id) {
-    res.redirect('/loginregister');
+    res.redirect('/login');
   }
 
   const user = users[req.session['user_id']]
@@ -311,14 +304,14 @@ app.post('/urls/:shortURL', (req, res) => {
 
   if (Object.keys(urls).includes(shortURL)) {
       urlDatabase[req.params.shortURL] =  { 
-      longURL: newURL, 
+      longURL: "http://www." +  newURL, 
       userID: req.session['user_id']
     };
     res.redirect(`/urls/${req.params.shortURL}`);
 
   }
   else {
-    res.redirect('/loginregister');
+    res.redirect('/login');
   }
 
 });

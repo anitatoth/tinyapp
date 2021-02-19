@@ -9,28 +9,20 @@
   <title>Login</title>
 </head>
 <body>
-
   <%- include('partials/_header') %>
-
   <body>
       <h1>Welcome back! Please login below.</h1>
-  
-    <form method="POST" action="/login">
+      <form method="POST" action="/login">
       <label>Email address</label>
       <input type="email" name="email" placeholder="Enter email"/>
       <br/>
-  
-      <label>Password:</label>
+        <label>Password:</label>
       <input type="password" name="password" placeholder="Password"/>
       <br/>
-  
-      <button class="btn btn-primary" type="submit">Login!</button>
+        <button class="btn btn-primary" type="submit">Login!</button>
     </form>
-
     <div>
-
     </div>
-
     <div>
       <h2> New here? Please <a href="/register">register</a> here. </h2>
     </div>
